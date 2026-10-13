@@ -158,6 +158,49 @@ Para terminar se pueden combinar argumentos:
 ``ls -ls``
 ``ls -lS``
 
+### Crear un Archivo
+Para crear un archivo se utiliza el copmando `` touch`` mas el nombre que le quieras dar a tu archivo.
+
+>``touch file``
+
+Puedes crear varios a la vez con diferentes nombres 
+
+>``touch file otroFile miFile``
+
+o con el comando 
+
+>``touch file{1..100}``
+
+### Borrar un archivo
+Para borrar un archivo utiliza el comando ``rm`` mas el nombre del archivo o archivos:
+
+>``rm file`` o ``rm otroFile miFile``
+
+### Leer un archivo 
+Ya sabes ubicarte y dezplazarte en el working directory, crear, borrar, mirar el contenido de un directorio y crear y borrar archivos, ahora aprenderemos a leer un archivo.
+
+Existen varios comandos utiles en diferentes escenarios, el mas basico es ``cat`` este comando imprime en la consola todo el archivo de una vez
+
+>``cat file``
+
+Sin embargo no es muy optimo si el archivo es muy grande, el comando ``more`` imprime un primer segmento del archivo y puedes avanzar pulsando la tecla enter
+
+>``more file``
+
+el comando `less` te permite usar las flechas de navegacion y ademàs buscar coincidencias de palabras dentro del archivo
+
+>``less file `` luego con /buscas una palabra.
+
+el comando `head` te mostrara por defecto las primeras 10 lineas del archivo, tambien puedes especificar el numero de lineas agregando el argumento `-n`
+
+>``head file`` o ``head -n5 file`` (5 es el numero de lineas)
+
+el comando `tail` hace lo mismo pero con las 10 ultimas lineas por defecto 
+
+>``tail file`` o ``tail -n5 file``
+
+Por ultimo se puede leer y ademas editar un archivo con un editor como vim, nano o emacs, vim ofrece un modo solo lectura con el comando `view`. 
+
 
 
 
