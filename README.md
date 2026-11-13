@@ -17,6 +17,16 @@ Cada sesion de shell esta anclada a la poscicion exacta en el **working tree dir
 
 Esta informacion se encuentra en la variable de entorno $PS1 (prompt string 1) y pede ser modificada.
 
+### Historial
+
+Si el historial de comandos esta activado se puede consultar. En el shell utiliza las flechas arriba/abajo. Con el comando `history` obtendras una lista numerada con los comandos utilizados en la sesion con el comando `!n mas el numero de el comando en la lista`puedes reutilizarlo.
+
+`history 5` te mostrara los ultimos 5 comandos utilizados y
+
+`history -c` Borrara el historial de la sesion.
+
+`set +o history` desactiva el historial para la sesion. 
+
 ## Working Directory
 En linux todo esta reprensentado directorios, el primer directorio del fileSystem es el root representado por /.
 
@@ -32,6 +42,36 @@ Ahora bien Linux permite acceder a directorios mediante atajos(**symlinks**) que
 Si accedes a un directorio a travez de un atajo desde otro directorio al ejecutar `pwd` que por defecto es `pwd -L` te mostrara la ruta logica, esta ruta es sacada de la variable de entorno $PWD ignorando el atajo. Pero si utilizas el comando `pwd -P` linux resolvera el atajo con el kernel (getcwd()) y te devolvera la ruta fisica. 
 
 >En la imagen anterior imagina que dentro de /home/user2/tienes un directorio/atajo que apunta hacia logs, si entras a los logs desde ese punto al ejecutar `pwd` te mostrara /home/user2 pero si en cambio utilizas `pwd -P` te mostrara /var/log
+
+### Soft Link o symLinks y Hard Link
+
+Primero es preciso entender que es un **inode**. El inode es la ficha tecnica que contiene los metadatos
+
+>metadatos: mtime, ctime, utime, permisos, user, group, etc..
+
+de un archivo y esta identificado por un numero unico dentro de su sistema de archivos.
+
+>cada sistema de archivos tiene su propia tabla de inodes. Un inode es el número interno que identifica a un archivo dentro de ese filesystem. El inode 12345 de / y el inode 12345 de /home (si están en particiones separadas) son dos cosas totalmente distintas.
+
+Sabiendo esto, cuando se crea un archivo regular el sistema le asigna un inode, crea una entrada en el directorio(nombre del archivo) que asocia la entrada con el numero inode y el inode queda con link count = 1, Entonces un hard link es una entrada del directorio que asocia el nombre con el inode.
+
+Se puede crear otro hard link para un archivo con el comando 
+
+>`ln /ruta/archivo /ruta/otro_nombre`
+
+<img width="516" height="398" alt="hardlink" src="https://github.com/user-attachments/assets/5ca1ce41-7014-473a-9d49-5321032b1021" />
+
+los dos apuntan al mismo inode, si se borra uno de los 2 el archivo seguira estando ya que una de las copias sigue viva 
+
+<img width="414" height="406" alt="hardlink2" src="https://github.com/user-attachments/assets/929f8e10-b511-4baa-83dd-737d7be593e6" />
+
+Un soft link o Symlink es un archivo especial, con un inode propio, cuyos datos son una ruta de texto hacia otro archivo. Al accederlo el kernel resuelve esa ruta y llega al inode del destino.
+
+<img width="521" height="414" alt="soflink" src="https://github.com/user-attachments/assets/63ff7d1f-18a4-4d53-8815-73a47227e7a5" />
+
+Si borras el destino, el enlace sigue existiendo pero ya no lleva a nada quedando "roto" o  dangling.
+
+<img width="380" height="398" alt="softlink2" src="https://github.com/user-attachments/assets/08f82d77-dbab-42f3-a375-0c5c2ac33567" />
 
 ## Crear Directorios
 Crea un directorio con el comando `mkdir` (make directory) mas el nombre del directorio.
@@ -87,7 +127,7 @@ Para tener la lista completa utiliza el argumento "a":
 
 >Entre los archivos encontraras un . y .. estos hacen referencia al mismo directorio y al directorio padre, para evitarlos utiliza ``ls -A``
 
-### Filtrar o ordenar la lista 
+## Filtrar o ordenar la lista 
 Por defecto se muestra una lista en orden alfabetico pero podemos filtrar la lista por:
 
 - *Tiempo*
@@ -158,8 +198,8 @@ Para terminar se pueden combinar argumentos:
 ``ls -ls``
 ``ls -lS``
 
-### Crear un Archivo
-Para crear un archivo se utiliza el copmando `` touch`` mas el nombre que le quieras dar a tu archivo.
+## Crear un Archivo
+Para crear un archivo vacio se utiliza el coomando `` touch`` mas el nombre que le quieras dar a tu archivo.
 
 >``touch file``
 
@@ -171,12 +211,12 @@ o con el comando
 
 >``touch file{1..100}``
 
-### Borrar un archivo
+## Borrar un archivo
 Para borrar un archivo utiliza el comando ``rm`` mas el nombre del archivo o archivos:
 
 >``rm file`` o ``rm otroFile miFile``
 
-### Leer un archivo 
+## Leer un archivo 
 Ya sabes ubicarte y dezplazarte en el working directory, crear, borrar, mirar el contenido de un directorio y crear y borrar archivos, ahora aprenderemos a leer un archivo.
 
 Existen varios comandos utiles en diferentes escenarios, el mas basico es ``cat`` este comando imprime en la consola todo el archivo de una vez
@@ -200,6 +240,68 @@ el comando `tail` hace lo mismo pero con las 10 ultimas lineas por defecto
 >``tail file`` o ``tail -n5 file``
 
 Por ultimo se puede leer y ademas editar un archivo con un editor como vim, nano o emacs, vim ofrece un modo solo lectura con el comando `view`. 
+
+## Copiar un archivo
+
+Para copiar un archivo se utiliza el comando ``cp``
+
+>``cp source target``
+
+Donde source es el nombre del archivo que quieres copiar y target es el nombre y la ubicacion final. 
+- Se copiara el contenido de el archivo source en el archivo target, REESCRIBIENDOLO si el archivo existe.
+- Si el archivo no existe se creara para copiar el contenido.
+- Si el target es un directorio se copiara con el mismo nombre. 
+
+Para copiar directorios se necesita agregar el argumento -R de recursive 
+
+>``cp -R directorio1 nuevoDirectorio``
+
+Si nuevoDirectorio no existe se crea como una copia pero si existe un nuevoDirectorio se creara una copia de directorio1 dentro y los archivos con el mismo nombre se sobreescribiran.
+
+Puedes copiar varios archivos a la vez dentro de un directorio:
+>``cp file1 file2 /targetDirectory``
+
+## Mover Archivos y Cambiar nombre 
+
+Se utiliza el comando ``mv`` para mover un archivo de un directorio a otro:
+
+>``mv source ruta/target``
+
+si `mv`se utiliza en el mismo directorio, es decir sin especificar una nueva ruta, solo cambiara el nombre del archivo
+
+>``mv archivo nuevoNombredeArchivo``
+
+## Buscar un archivo
+
+Con el comando `find` se busca un archivo de forma recursiva a partir de una ruta y se le pueden agregar condiciones:
+
+>``find /ruta condiciones``
+
+Si no se especifica un directorio parte desde la ruta actual, se pueden pasar varios argumentos a la vez para realizar la busqueda ejem:
+`-name` ,`-type` , ``user`` , `size`
+
+>``find data.tx`` buscara un archivo con nombre data.tx en el directorio actual.
+
+## Obtener informacion de un archivo
+
+Con el comando `file` se obtiene informacion del contenido de un archivo sin tener que abrirlo o ejecutarlo 
+
+>`file archivo.tx`
+
+Con el comando `stat` se obtiene informacion mas detallada como sus metadatos.
+
+>`stat archivo.tx`
+
+## Pipes y Redireccion
+
+
+
+
+
+
+
+
+
 
 
 
